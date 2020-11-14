@@ -3,8 +3,9 @@ module MARC
     class Reader
       include Enumerable
 
-      def initialize(file)
+      def initialize(file, exception_handler: nil)
         @file = file
+        @exception_handler = exception_handler
       end
 
       def unpacker
@@ -14,18 +15,24 @@ module MARC
         end
       end
 
-      def each
+      def each(&block)
         return to_enum(:each) unless block_given?
 
         until @file.eof?
-          yield read_one
+          begin
+            yield read_one
+          rescue => e
+            raise e unless @exception_handler
+
+            @exception_handler.call(self, e, block)
+          end
         end
       end
 
       def read_one
         header = unpacker.read
 
-        raise(MARC::Msgpack::Error, 'not our marc') unless header['type'] == 'marc' && header.dig('version', 0) == 1
+        raise(MARC::Msgpack::Error, "expected type=marc, version=1.x, got '#{header}'") unless header['type'] == 'marc' && header.dig('version', 0) == 1
 
         r = MARC::Record.new
         r.leader = header['leader']

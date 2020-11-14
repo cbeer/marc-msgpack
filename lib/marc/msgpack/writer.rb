@@ -21,7 +21,8 @@ module MARC
         packer.write_array_header(record.fields.length)
         record.fields.each do |field|
           if field.is_a? MARC::ControlField
-            packer.write(field.to_marchash)
+            tag, value = field.to_marchash
+            packer.write([tag, value])
           else
             tag, ind1, ind2, subfields = field.to_marchash
             subfields = subfields.flatten
@@ -30,7 +31,6 @@ module MARC
           end
         end
       end
-      # close underlying filehandle
 
       def close
         @packer.flush
