@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Chris Beer"]
   spec.email         = ["cabeer@stanford.edu"]
 
-  spec.summary       = ""
+  spec.summary       = "Encode MARC records using msgpack"
   spec.required_ruby_version = Gem::Requirement.new(">= 2.3.0")
 
   # Specify which files should be added to the gem when it is released.
