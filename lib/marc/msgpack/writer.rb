@@ -16,18 +16,24 @@ module MARC
       end
 
       def write(record)
-        packer.write(type: 'marc', version: [1, 0], leader: TruncatedLeader.new(record.leader))
+        packer.write_array_header(2)
 
+        packer.write(['marc', 0b01, TruncatedLeader.new(record.leader)])
         packer.write_array_header(record.fields.length)
         record.fields.each do |field|
           if field.is_a? MARC::ControlField
-            tag, value = field.to_marchash
-            packer.write([tag, value])
+            packer.write([field.tag, field.value])
           else
-            tag, ind1, ind2, subfields = field.to_marchash
-            subfields = subfields.flatten
-            subfields = subfields.map { |x| to_msgpack_string(x) } if compression_threshold > 0
-            packer.write([tag, ind1, ind2, subfields])
+            indicators = if field.indicator1 == ' ' && field.indicator2 == ' '
+              []
+            else
+              [
+                field.indicator1 == ' ' ? nil : field.indicator1,
+                field.indicator2 == ' ' ? nil : field.indicator2
+              ]
+            end
+            subfields = field.subfields.flat_map { |s| [s.code, compression_threshold > 0 ? to_msgpack_string(s.value) : s.value] }
+            packer.write([field.tag, indicators, subfields])
           end
         end
       end

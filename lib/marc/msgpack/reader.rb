@@ -30,18 +30,20 @@ module MARC
       end
 
       def read_one
-        header = unpacker.read
+        header, fields = unpacker.read
 
-        raise(MARC::Msgpack::Error, "expected type=marc, version=1.x, got '#{header}'") unless header['type'] == 'marc' && header.dig('version', 0) == 1
+        type, version, leader = header
+        raise(MARC::Msgpack::Error, "expected is=marc, v=0b10, got '#{header}'") unless type == 'marc' && version == 0b01
 
         r = MARC::Record.new
-        r.leader = header['leader']
+        r.leader = leader
 
-        unpacker.read.each do |f|
-          if f.length == 2
-            r << MARC::ControlField.new(*f)
+        fields.each do |(tag, *values)|
+          if values.length == 1
+            r << MARC::ControlField.new(tag, *values)
           else
-            r << MARC::DataField.new(f[0], f[1], f[2], *f[3].each_slice(2).to_a)
+            indicators, subfields = values
+            r << MARC::DataField.new(tag, indicators[0], indicators[1], *subfields.each_slice(2).to_a)
           end
         end
 
