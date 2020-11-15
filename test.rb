@@ -14,6 +14,7 @@ Benchmark.bm do |x|
     writer.close
   end
   puts "msgpack\t#{io.string.bytesize} bytes"
+  puts "msgpack\t#{Zlib::Deflate.deflate(io.string).bytesize} bytes (deflate)"
 
   x.report('msgpack in') do
     io.rewind
@@ -26,6 +27,7 @@ Benchmark.bm do |x|
     sample.each { |r| writer.write(r) }
   end
   puts "marc\t#{io.string.bytesize} bytes"
+  puts "marc\t#{Zlib::Deflate.deflate(io.string).bytesize} bytes (deflate)"
 
   x.report('marc in') do
     io.rewind
@@ -39,6 +41,7 @@ Benchmark.bm do |x|
   #   io.write("</collection>")
   # end
   # puts "xml\t#{io.string.bytesize} bytes"
+  # puts "xml\t#{Zlib::Deflate.deflate(io.string).bytesize} bytes (deflate)"
   #
   # x.report('xml in') do
   #   io.rewind
@@ -58,6 +61,7 @@ r = sample.sample(10).each do |r|
   puts "   json\t#{r.to_marchash.to_json.bytesize}"
   puts "   xml\t#{r.to_xml.to_s.bytesize}"
 
+  puts "   msgpack\t#{Zlib::Deflate.deflate(MARC::Msgpack::Writer.encode(r)).bytesize}\tdeflate"
   puts "   marc\t#{Zlib::Deflate.deflate(r.to_marc).bytesize}\tdeflate"
   puts "   json\t#{Zlib::Deflate.deflate(r.to_marchash.to_json).bytesize}\tdeflate"
   puts "   xml\t#{Zlib::Deflate.deflate(r.to_xml.to_s).bytesize}\tdeflate"
