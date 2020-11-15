@@ -58,6 +58,32 @@ A MARC record encoded in msgpack is a 2-element array consisting of:
 
 Note: Subfield values may contain msgpack strings or may be encoded with extension type `0x01`.
 
+
+## Performance
+
+For this test, I'm using a 1000,000 MARC record data set and reading + writing data to an in-memory StringIO (see test.rb).
+
+| what | user | system | total | real | % of MARC21|
+|---|---:|---:|---:|---:|---:|
+| marc write    | 17.481686 | 0.299942 | 17.781628 | ( 17.789118) | 100% |
+| json write    |  7.429433 | 0.071398 |  7.500831 | (  7.503990) |  42% |
+| msgpack write |  7.604279 | 0.133938 |  7.738217 | (  7.740787) |  43% |
+| marc read    |  23.358852 | 0.088938 |  23.447790 | ( 23.455563) | 100% |
+| json read    |  13.268984 | 0.016315 |  13.285299 | ( 13.289286) |  57% |
+| msgpack read |  12.729819 | 0.263409 |  12.993228 | ( 13.001891) |  55% |
+
+----
+
+| what | uncompressed | % | w/ deflate | % |
+|---|---:|---:|---:|---:|
+| marc    | 87.4 MB | 100% | 26.1 MB | 30% |
+| json    | 119 MB  | 135% | 22.8 MB | 26% |
+| msgpack | 79.1 MB |  90% | 22.7 MB | 26% |
+
+---
+
+So, should you use this? 🤷‍♂️
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

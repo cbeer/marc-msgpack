@@ -12,7 +12,7 @@ require 'nokogiri'
 # puts "msgpack\t #{i} records"
 # exit 0
 
-sample = MARC::Reader.new(ARGF).first(10000).to_a
+sample = MARC::Reader.new(ARGF).first(100000).to_a
 
 io = StringIO.new
 Benchmark.bm do |x|
