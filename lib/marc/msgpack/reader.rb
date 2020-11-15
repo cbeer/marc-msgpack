@@ -28,7 +28,7 @@ module MARC
 
       def read_one(header, fields)
         type, version, leader = header
-        raise(MARC::Msgpack::Error, "expected is=marc, v=0b10, got '#{header}'") unless type == 'marc' && version == 0b01
+        raise(MARC::Msgpack::Error, "expected type=marc, v=1, got '#{header}'") unless type == 'marc' && version == 0b01
 
         r = MARC::Record.new
         r.leader = leader
