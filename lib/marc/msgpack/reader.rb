@@ -24,6 +24,10 @@ module MARC
         end
       end
 
+      def skip(n = 1)
+        n.times { unpacker.skip }
+      end
+
       private
 
       def read_one(header, fields)
