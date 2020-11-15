@@ -9,10 +9,7 @@ module MARC
       end
 
       def packer
-        @packer ||= MessagePack::Packer.new(@file).tap do |pk|
-          pk.register_type(0x01, CompressedString, :to_msgpack_ext)
-          pk.register_type(0x02, TruncatedLeader, :to_msgpack_ext)
-        end
+        @packer ||= MARC::Msgpack.factory.packer(@file)
       end
 
       def write(record)

@@ -68,5 +68,12 @@ module MARC
         LazyDecompressedString.new(obj)
       end
     end
+
+    def self.factory
+      @factory ||= MessagePack::Factory.new.tap do |factory|
+        factory.register_type(0x01, CompressedString, packer: :to_msgpack_ext, unpacker: :from_msgpack_ext)
+        factory.register_type(0x02, TruncatedLeader, packer: :to_msgpack_ext, unpacker: :from_msgpack_ext)
+      end
+    end
   end
 end
